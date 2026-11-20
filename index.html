@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Stalboekje</title>
+<style>
+:root{
+  --bg:#f3f1e8; --card:#fffdf7; --ink:#2c3326; --soft:#5f6857; --line:#ddd8c6;
+  --moss:#5b7042; --moss-d:#43552f; --moss-l:#e5ebd9;
+  --ok:#2f7d43; --ok-bg:#dcecdd; --mid:#9a7a08; --mid-bg:#f3e8c4; --bad:#b8352b; --bad-bg:#f6dfdc;
+}
+*{box-sizing:border-box}
+html{font-size:19px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45}
+.wrap{max-width:760px;margin:0 auto;padding:12px 14px 120px}
+h1{font-size:1.35rem;margin:6px 0 12px;color:var(--moss-d)}
+h2{font-size:1.15rem;margin:22px 0 8px;color:var(--moss-d)}
+p{margin:6px 0}
+.muted{color:var(--soft);font-size:.9rem}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 0 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.tab{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:8px 4px;font-size:.85rem;font-weight:600;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:68px;justify-content:center}
+.tab .ic{font-size:1.5rem;line-height:1}
+.tab.on{background:var(--moss);border-color:var(--moss);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.group-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:20px 0 6px}
+.group-h h2{margin:0}
+.horse{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
+.horse:hover{border-color:var(--moss)}
+.horse .nm{font-weight:700;flex:1;min-width:0;overflow-wrap:anywhere}
+.horse .sx{font-size:1.2rem;width:1.4em;text-align:center}
+.pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.82rem;font-weight:600;background:var(--moss-l);color:var(--moss-d);white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.mid{background:var(--mid-bg);color:var(--mid)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
+button.big,a.big{display:block;width:100%;border:none;border-radius:14px;background:var(--moss);color:#fff;font:inherit;font-weight:700;padding:15px 16px;margin:10px 0;cursor:pointer;text-align:center;text-decoration:none}
+button.big:hover{background:var(--moss-d)}
+button.big.light{background:var(--moss-l);color:var(--moss-d)}
+button.big.red{background:var(--bad-bg);color:var(--bad)}
+button.small{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;font:inherit;font-size:.9rem;cursor:pointer;color:var(--ink)}
+button.link{border:none;background:none;color:var(--moss-d);text-decoration:underline;font:inherit;font-size:.9rem;padding:6px 0;cursor:pointer}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;padding:12px;border:1px solid #c9c3ae;border-radius:10px;background:#fff;color:var(--ink)}
+textarea{min-height:80px}
+.row{display:flex;gap:10px}
+.row>*{flex:1;min-width:0}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+.seg button.on{border-color:var(--moss);background:var(--moss-l);color:var(--moss-d)}
+.stal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.stal.best{border:2px solid var(--ok)}
+.stal .top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.stal .nm{font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
+.stal .sdg{font-weight:800;font-size:1.15rem;color:var(--moss-d);white-space:nowrap}
+.stal .info{margin:6px 0;color:var(--soft);font-size:.92rem}
+.stal.fam{opacity:.75}
+.back{margin:4px 0 8px}
+.empty{text-align:center;color:var(--soft);padding:24px 10px;background:var(--card);border:1px dashed var(--line);border-radius:14px;margin:12px 0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--moss-d);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.2);max-width:92vw;z-index:20;text-align:center}
+.days{font-weight:800;font-size:1.1rem}
+.ver{text-align:center;color:var(--soft);font-size:.75rem;margin-top:30px}
+.tree{font-size:.92rem;line-height:1.7}
+.tree .lv1{margin-left:0}.tree .lv2{margin-left:1.2em}.tree .lv3{margin-left:2.4em}
+.search{margin:8px 0 4px}
+.tabs{grid-template-columns:repeat(5,1fr);gap:6px}
+.tab{white-space:nowrap;padding:8px 2px}
+@media (max-width:420px){.tab{font-size:.72rem}}
+details.uitleg{background:var(--moss-l);border-radius:12px;padding:10px 14px;margin:10px 0}
+details.uitleg summary{font-weight:700;cursor:pointer;color:var(--moss-d)}
+details.uitleg ul{margin:6px 0;padding-left:1.2em}
+.nivs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.niv{font-weight:400;margin:0}.niv span{display:block;font-size:.85rem;color:var(--soft)}
+.horse .sub{display:block;margin-top:4px;font-weight:400}
+.horse .sub .pill{white-space:normal}
+.info .pill{margin-right:4px}
+.ov{position:fixed;inset:0;background:rgba(30,35,25,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.dlg{background:var(--card);border-radius:16px;padding:18px;max-width:440px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.dlg p{font-size:1.02rem;margin:0 0 6px;white-space:pre-line}
+@media (max-width:420px){html{font-size:18px}.tab{font-size:.78rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🐴 Stalboekje</h1>
+  <div id="cloud" style="margin:-6px 0 6px"></div>
+  <nav class="tabs" id="tabs"></nav>
+  <main id="main"></main>
+  <div class="ver">Stalboekje · versie 2026-11-20d</div>
+</div>
+<div id="toast" class="toast" style="display:none"></div>
+<div id="dlg"></div>
+
+<script>
+"use strict";
+/* ============ Opslag ============ */
+var KEY = "stalboekje-v1";
+var D = load();
+function blank(){
+  var g1=uid(), g2=uid(), g3=uid();
+  return {
+    groups:[{id:g1,name:"Merries"},{id:g2,name:"Hengsten"},{id:g3,name:"Veulens"}],
+    horses:[],          // eigen paarden
+    db:[],              // ingelezen uit de Stalmanager (alleen lezen)
+    dbDate:"",
+    ped:[],
+    rassen:["fries"]
+  };
+}
+function load(){
+  try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.groups&&x.horses){x.db=x.db||[];x.ped=x.ped||[];x.rassen=x.rassen||["fries"];return x}}catch(e){}
+  return blank();
+}
+function save(){D.t=Date.now();try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){info("Opslaan lukte niet op dit apparaat.")}if(typeof dbxLater==="function")dbxLater()}
+function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4)}
+
+/* ============ Hulpjes ============ */
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function norm(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim().toLowerCase()}
+function num(v){var n=parseFloat(String(v==null?"":v).replace(",","."));return isNaN(n)?null:n}
+function sdgOf(h){if(!h)return null;var t=num(h.sdg);if(t!==null)return t;var a=num(h.S),b=num(h.D),c=num(h.G);if(a===null&&b===null&&c===null)return null;return (a||0)+(b||0)+(c||0)}
+function f1(n){return n===null||n===undefined?"–":(Math.round(n*10)/10).toLocaleString("nl-NL",{minimumFractionDigits:1,maximumFractionDigits:1})}
+function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function addDays(iso,n){var p=iso.split("-");var d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function daysUntil(iso){var p=iso.split("-");var a=new Date(+p[0],+p[1]-1,+p[2]);var t=new Date();t.setHours(0,0,0,0);return Math.round((a-t)/864e5)}
+function nlDate(iso){if(!iso)return"";var p=iso.split("-");var m=["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];return (+p[2])+" "+m[+p[1]-1]}
+function toast(t){var el=document.getElementById("toast");el.textContent=t;el.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){el.style.display="none"},2800)}
+function rasOk(ras,allowEmpty){var r=norm(ras);if(!r)return !!allowEmpty;return D.rassen.some(function(x){return r.indexOf(x)===0||(x==="fries"&&r.indexOf("friesian")>=0)})}
+var DRACHT_DAGEN=7;
+var DLG=[];
+function dialog(msg,btns,input){
+  DLG=btns;var h='<div class="ov"><div class="dlg"><p>'+esc(msg)+'</p>';
+  if(input)h+='<input id="dlg-in" type="'+(input.type||"text")+'" value="'+esc(input.value||"")+'" autocomplete="off">';
+  btns.forEach(function(b,i){h+='<button class="big'+(b.cls?" "+b.cls:"")+'" onclick="dlgDo('+i+')">'+esc(b.t)+'</button>'});
+  document.getElementById("dlg").innerHTML=h+'</div></div>';
+  var el=document.getElementById("dlg-in");if(el){el.focus();el.select&&input.type!=="date"&&el.select()}
+}
+function dlgDo(i){var el=document.getElementById("dlg-in"),v=el?el.value:"";var b=DLG[i];document.getElementById("dlg").innerHTML="";if(b&&b.f)b.f(v)}
+function info(msg){dialog(msg,[{t:"Oké"}])}
+function ask(msg,yes,f,red){dialog(msg,[{t:yes,cls:red?"red":"",f:f},{t:"Nee, toch niet",cls:"light"}])}
+
+/* ============ Stamboom & inteelt ============ */
+// Alle bekende paarden op naam: eerst de eigen paarden, dan het ingelezen bestand.
+function byName(){
+  var m=new Map();
+  function put(h){var k=norm(h.name);if(!k)return;var cur=m.get(k);if(!cur||(!cur.sire&&!cur.dam&&(h.sire||h.dam)))m.set(k,h)}
+  D.horses.forEach(put);D.ped.forEach(put);D.db.forEach(put);
+  return m;
+}
+function find(map,name){if(!name)return null;var k=norm(name);var h=map.get(k);if(h)return h;var k2=norm(String(name).replace(/\s*\([^)]*\)\s*$/,""));return map.get(k2)||null}
+// Voorouders tot en met 3 stappen boven een ouder = 4 generaties van het veulen (zoals Horse Nation).
+function ancestors(name,map,maxD){
+  var out=new Map();
+  (function walk(nm,d){
+    if(!nm||d>maxD)return;var k=norm(String(nm).replace(/\s*\([^)]*\)\s*$/,""));if(!k)return;
+    var e=out.get(k);if(!e){e={name:nm,depths:[]};out.set(k,e)}e.depths.push(d);
+    var h=find(map,nm);if(!h)return;walk(h.sire,d+1);walk(h.dam,d+1);
+  })(name,0);
+  return out;
+}
+function coi(sireName,damName,map){
+  var a=ancestors(sireName,map,3),b=ancestors(damName,map,3),F=0,shared=[];
+  a.forEach(function(pa,k){var pb=b.get(k);if(!pb)return;var v=0;pa.depths.forEach(function(x){pb.depths.forEach(function(y){v+=Math.pow(.5,x+y+1)})});F+=v;shared.push({name:pa.name,v:v})});
+  shared.sort(function(x,y){return y.v-x.v});
+  return {F:F,shared:shared};
+}
+function relation(st,mare,map){
+  var same=function(a,b){return a&&b&&norm(a)===norm(b)};
+  if(same(mare.sire,st.name))return "vader van "+mare.name;
+  if(same(st.dam,mare.name))return "zoon van "+mare.name;
+  var bs=same(st.sire,mare.sire),bd=same(st.dam,mare.dam);
+  if(bs&&bd)return "volle broer van "+mare.name;
+  if(bs||bd)return "halfbroer van "+mare.name;
+  var ms=find(map,mare.sire),md=find(map,mare.dam);
+  if((ms&&same(ms.sire,st.name))||(md&&same(md.sire,st.name)))return "opa van "+mare.name;
+  return null;
+}
+function coiPill(F){
+  var p=Math.round(F*1000)/10;
+  if(F<=0)return '<span class="pill ok">0% inteelt</span>';
+  if(F<=.05)return '<span class="pill ok">'+p.toLocaleString("nl-NL")+'% inteelt</span>';
+  if(F<=.125)return '<span class="pill mid">'+p.toLocaleString("nl-NL")+'% inteelt</span>';
+  return '<span class="pill bad">'+p.toLocaleString("nl-NL")+'% inteelt</span>';
+}
+
+/* ============ Dekhengsten ============ */
+function stallions(){
+  var list=[],seen={};
+  D.db.forEach(function(h){if(h.dek&&h.g==="H"&&rasOk(h.ras,h.eigen)){var k=norm(h.name);if(seen[k])return;seen[k]=1;list.push({h:h,eigen:false})}});
+  D.horses.forEach(function(h){if(h.g==="H"&&!h.geenDek){var k=norm(h.name);if(seen[k])return;seen[k]=1;list.push({h:h,eigen:true})}});
+  return list;
+}
+
+/* ============ Uit de Stalmanager (plakken) ============ */
+var HN_DISC=[{id:"dres",name:"Dressuur",levels:["BB","B","L1","L2","M1","M2","Z1","Z2","ZZ-Licht","ZZ-Zwaar"]},{id:"spr",name:"Springen",levels:["B","L","M","Z","ZZ"]},{id:"xc",name:"Cross-country",levels:["B-intro","B","L","M","Z"]},{id:"rei",name:"Reining",levels:["L5","L4","L3","L2","L1"]},{id:"tra",name:"Trail",levels:["L5","L4","L3","L2","L1"]},{id:"wp",name:"Western Pleasure",levels:["L5","L4","L3","L2","L1"]}];
+var HN_PSYM={"\u2605":"ster","K":"keur","E":"elite","P":"preferent"};
+var HN_COMBOS=[[{dres:9,spr:4},[100,100,100]],[{dres:4,spr:4,xc:4},[100,100,100]],[{rei:4,tra:4,wp:4},[100,100,100]],[{dres:9,rei:4},[90,100,100]],[{dres:4,xc:4,rei:4},[90,100,100]],[{spr:4,tra:4,wp:4},[100,90,100]],[{dres:4,spr:4,tra:4},[100,100,85]],[{dres:4,rei:4,tra:4},[100,100,85]],[{spr:4,xc:4,wp:4},[95,90,100]],[{xc:4,rei:4,wp:4},[85,100,100]],[{dres:9,xc:4},[100,100,80]],[{dres:4,spr:4,rei:4},[85,95,100]],[{xc:4,tra:4,wp:4},[100,100,80]],[{spr:4,xc:4,tra:4},[100,75,100]],[{xc:4,rei:4,tra:4},[90,85,100]],[{dres:4,spr:4,wp:4},[100,100,75]],[{dres:4,rei:4,wp:4},[100,100,75]],[{spr:4,rei:4,wp:4},[80,85,100]],[{dres:9,tra:4},[100,100,65]],[{dres:4,xc:4,tra:4},[100,100,65]],[{spr:4,rei:4,tra:4},[85,70,100]],[{dres:9,wp:4},[100,100,55]],[{dres:4,xc:4,wp:4},[100,100,55]],[{spr:4,xc:4,rei:4},[70,70,100]],[{dres:4,tra:4,wp:4},[100,100,40]]].map(function(c,i){var ids=["dres","spr","xc","rei","tra","wp"].filter(function(id){return c[0][id]!==void 0});var parts=ids.map(function(id){return id==="dres"?(c[0].dres>=9?"Dressuur t/m ZZ-Zwaar":"Dressuur t/m M1"):HN_DISC.find(function(d){return d.id===id}).name});return{i:i,d:c[0],ids:ids,S:c[1][0],D:c[1][1],G:c[1][2],parts:parts,name:parts.join(" + "),full:c[1][0]>=100&&c[1][1]>=100&&c[1][2]>=100}});
+function hnComboOk(n,c){return c.ids.every(function(id){return n[id]>=c.d[id]})}
+function hnComboBetter(a,b){if(!b)return!0;if(a.full!==b.full)return a.full;var sa=a.S+a.D+a.G,sb=b.S+b.D+b.G;if(sa!==sb)return sa>sb;return Math.min(a.S,a.D,a.G)>Math.min(b.S,b.D,b.G)}
+function hnNumP(v){var n=parseFloat(String(v).replace(",","."));return isNaN(n)?null:n}
+function hnLvlIdx(d,t){var f=function(v){return String(v).toLowerCase().replace(/[^a-z0-9]/g,"")},q=f(t),k=d.levels.findIndex(function(n){return f(n)===q});if(k>=0)return k;var c=d.levels.map(function(n,i){return f(n).indexOf(q)===0&&q.length>2?i:-1}).filter(function(i){return i>=0});return c.length===1?c[0]:-1}
+function hnHtmlToMd(html){var doc=new DOMParser().parseFromString(html,"text/html"),out=[];var BLOCK=/^(DIV|P|H[1-6]|SECTION|ARTICLE|HEADER|FOOTER|TABLE|TR|TD|TH)$/;
+ var inl=function(n){if(n.nodeType===3)return n.nodeValue.replace(/\s+/g," ");if(n.nodeType!==1)return"";var t=n.tagName;if(t==="UL"||t==="OL"||t==="SCRIPT"||t==="STYLE")return"";if(t==="BR")return"\n";if(t==="A"){var tx=n.textContent.replace(/\s+/g," ").trim();return tx?"["+tx+"]("+(n.getAttribute("href")||"")+")":""}
+  var s="";n.childNodes.forEach(function(c){s+=inl(c)});return BLOCK.test(t)?"\n"+s+"\n":s};
+ var walk=function(el,depth){el.childNodes.forEach(function(c){if(c.nodeType!==1)return;if(c.tagName==="UL"||c.tagName==="OL"){c.childNodes.forEach(function(li){if(li.nodeType!==1||li.tagName!=="LI")return;var body=inl(li).split("\n").map(function(x){return x.trim()}).filter(Boolean);if(body.length){out.push(new Array(depth*3+1).join(" ")+"* "+body[0]);body.slice(1).forEach(function(x){out.push(x)})}walk(li,depth+1)})}else walk(c,depth)})};
+ walk(doc.body,0);return out.join("\n")}
+function hnParseTree(text){var lines=text.replace(/\r/g,"").split("\n"),nodes=[],stack=[],linkRe=/\[([^\]]*)\]\(([^)]*)\)/g;
+ for(var i=0;i<lines.length;i++){var m=lines[i].match(/^(\s*)[*\-\u2022]\s*([\u2642\u2640])(.*)$/);if(!m)continue;
+  var ind=m[1].replace(/\t/g,"   ").length,rest=m[3],name=null,hid=null,x,st=[];linkRe.lastIndex=0;
+  while((x=linkRe.exec(rest))){var mm=x[2].match(/\/horses\/(\d+)/);if(mm){name=x[1].trim();hid=mm[1]}else if(/\/user\//.test(x[2])&&x[1].trim())st.push(x[1].trim())}
+  if(!name)name=rest.replace(linkRe,"").trim();
+  var nx=[];for(var q=i+1;q<lines.length&&nx.length<2;q++){if(/^\s*[*\-\u2022]\s*[\u2642\u2640]/.test(lines[q]))break;if(lines[q].trim())nx.push(lines[q])}var info=nx[0]||"",sm=info.match(/^\s*(.*?)\s*S\s*([\d.,]+)\s*D\s*([\d.,]+)\s*G\s*([\d.,]+)/),pl=(nx[1]||"").trim();if(!sm&&nx[0]&&HN_PSYM[nx[0].trim()]){pl=nx[0].trim()}
+  var node={stalnaam:st.join(" "),ind:ind,gender:m[2]==="\u2642"?"H":"M",name:name,hid:hid,ras:sm?sm[1].trim():"",S:sm?hnNumP(sm[2]):null,D:sm?hnNumP(sm[3]):null,G:sm?hnNumP(sm[4]):null,pred:HN_PSYM[pl]||"",predKnown:!!HN_PSYM[pl],sire:null,dam:null};
+  while(stack.length&&stack[stack.length-1].ind>=ind)stack.pop();
+  if(stack.length){var p=stack[stack.length-1];if(node.gender==="H")p.sire=node;else p.dam=node}
+  stack.push(node);nodes.push(node)}
+ if(!nodes.length)return null;var mn=Math.min.apply(null,nodes.map(function(n){return n.ind})),tops=nodes.filter(function(n){return n.ind===mn});
+ return{type:"tree",nodes:nodes,root:tops.length===1?tops[0]:null,partial:tops.length>1}}
+function hnParseStal(text){var lines=text.replace(/\r/g,"").split("\n"),out=[];
+ for(var i=0;i<lines.length;i++){var L=lines[i];if(/^\s*[*\-\u2022]/.test(L))continue;var m=L.match(/^\s*(.+?)\s*([\u2642\u2640])\s+(.*?)\s*S\s*([\d.,]+)\s*D\s*([\d.,]+)\s*G\s*([\d.,]+)/);if(!m)continue;
+  var age=L.match(/(\d+(?:[.,]\d+)?)\s*jaar/),pl=(lines[i-1]||"").trim(),lv={},pt={},pc={},unk=[];
+  for(var j=i+1;j<lines.length&&j<=i+4;j++){if(/[\u2642\u2640]/.test(lines[j]))break;var re=/(?:^|[\s\u00b7])(WP|XC|CC|[DSRTPC])\s+([A-Za-z0-9-]+)\+(\d+)(?:\s+(\d+)\s*%)?/g,x;
+   while((x=re.exec(lines[j]))){var id={D:"dres",S:"spr",R:"rei",T:"tra",P:"wp",WP:"wp",C:"xc",XC:"xc",CC:"xc"}[x[1]],d=HN_DISC.find(function(q){return q.id===id}),k=d?hnLvlIdx(d,x[2]):-1;if(k>=0){lv[id]=k;pt[id]=+x[3];if(x[4]!==void 0)pc[id]=+x[4]}else unk.push(x[1]+" "+x[2])}}
+  out.push({name:m[1].trim(),gender:m[2]==="\u2642"?"H":"M",ras:m[3].trim(),S:hnNumP(m[4]),D:hnNumP(m[5]),G:hnNumP(m[6]),age:age?hnNumP(age[1]):null,lv:lv,pt:pt,pc:pc,unk:unk,pred:HN_PSYM[pl]||""})}
+ var byName={};out.forEach(function(r){(byName[r.name]=byName[r.name]||[]).push(r)});var grp="",started=!1,isLv=function(x){return/^\s*(WP|XC|CC|[DSRTPC])\s+[A-Za-z0-9-]+\+\d+/.test(x)},hm=/^\s*(.+?)\s*([\u2642\u2640])\s+(.*?)\s*S\s*[\d.,]+\s*D/;
+ for(var i=0;i<lines.length;i++){var L=lines[i],t=L.trim();if(!started){if(/^Naam\tRas/.test(t)||/Groepen beheren/.test(t))started=!0;continue}var mm=!/^\s*[*\-\u2022]/.test(L)&&L.match(hm);
+  if(mm){var nm=mm[1].trim(),rr=(byName[nm]||[]).find(function(x){return x.group===void 0});if(rr)rr.group=grp;var j=i+1;while(j<lines.length&&isLv(lines[j]))j++;if(j<lines.length&&/^\d+$/.test(lines[j].trim()))j++;if(j<lines.length&&!hm.test(lines[j])){var st=lines[j].trim();if(rr)rr.status=st;j++;if(/^drachtig/i.test(st)&&j<lines.length&&/^\d{1,2}-\d{1,2}-\d{4}$/.test(lines[j].trim())){if(rr)rr.dDate=lines[j].trim();j++}}i=j-1;continue}
+  if(!t||HN_PSYM[t]||t==="\u2013")continue;if(/^\uD83C\uDFF7|Stalnaam & Initialen/.test(t))break;grp=t}
+ out.forEach(function(r){if(r.group===void 0)r.group=""});
+ var im=text.match(/Initialen:\s*([^\n(]+?)\s*\((achtervoegsel|voorvoegsel)\)/i);return out.length?{type:"stal",rows:out,init:im?im[1].trim():"",side:im?im[2].toLowerCase():""}:null}
+
+/* ============ Fokbonus ============ */
+var DISC_IDS=["dres","spr","xc","rei","tra","wp"];
+function nivOf(h){var n=h&&(h.niv||h.niveaus);if(!n)return null;var o={},any=false;DISC_IDS.forEach(function(id){var v=n[id];if(v===undefined||v===null||v===""){o[id]=-1}else{o[id]=+v;any=true}});return any?o:null}
+function fokInfo(h){
+  var n=nivOf(h);
+  if(!n)return h&&h.fok?{known:true,full:true,txt:"heeft fokbonus"}:{known:false};
+  var ok=HN_COMBOS.filter(function(c){return hnComboOk(n,c)}),b=null;ok.forEach(function(c){if(hnComboBetter(c,b))b=c});
+  var full=!!(b&&b.full)||!!h.fok;
+  var r={known:true,full:full,part:!full&&b?b:null,n:n};
+  if(!full){
+    var best=null;
+    HN_COMBOS.filter(function(c){return c.full}).forEach(function(c){
+      var steps=[],k=0;c.ids.forEach(function(id){var to=c.d[id],fr=n[id];if(fr>=to)return;var D=HN_DISC.find(function(d){return d.id===id});k+=to-Math.max(fr,-1);steps.push(D.name+" "+(fr>=0?D.levels[fr]+" → ":"→ ")+D.levels[to])});
+      if(!best||k<best.k)best={k:k,steps:steps,c:c};
+    });
+    r.next=best;
+  }
+  return r;
+}
+function fokLine(h,kort){
+  var f=fokInfo(h);if(!f.known)return kort?"":'<span class="pill">Fokbonus onbekend</span>';
+  if(f.full)return '<span class="pill ok">✅ Fokbonus</span>';
+  var t=f.part?'<span class="pill mid">Fokbonus deels: '+["S","D","G"].map(function(k){return k+" "+f.part[k]+"%"}).join(" · ")+'</span>':'<span class="pill">⏳ Nog geen fokbonus</span>';
+  if(kort)return t;
+  return t+(f.next&&f.next.steps.length?'<div class="info">Voor de volle fokbonus nog: '+f.next.steps.map(esc).join(", ")+'</div>':'');
+}
+var FOK_UITLEG='<details class="uitleg"><summary>ℹ️ Wat is de fokbonus?</summary>'+
+ '<p>Een veulen krijgt extra punten als zijn vader en moeder genoeg getraind zijn. Dat heet de fokbonus.</p>'+
+ '<p><b>De volle fokbonus</b> (100% op S, D en G) heeft een paard als het één van deze drie heeft gehaald:</p>'+
+ '<ul><li>Reining, Trail én Western Pleasure op L1</li><li>Dressuur ZZ-Zwaar én Springen ZZ</li><li>Dressuur M1, Springen ZZ én Cross-country Z</li></ul>'+
+ '<p>Andere combinaties geven een deel van de bonus, bijvoorbeeld 90% op S.</p>'+
+ '<p><b>Het telt op de dag dat het veulen geboren wordt</b>, niet op de dag van het dekken. Een drachtige merrie kan haar fokbonus dus nog halen voordat ze bevalt.</p></details>';
+function nivSelects(h){
+  var n=nivOf(h)||{};
+  return '<div class="nivs">'+HN_DISC.map(function(d){var v=n[d.id]===undefined?-1:n[d.id];
+    return '<label class="niv"><span>'+d.name+'</span><select id="niv-'+d.id+'"><option value="-1">–</option>'+d.levels.map(function(l,i){return '<option value="'+i+'"'+(i===v?" selected":"")+'>'+l+'</option>'}).join("")+'</select></label>'}).join("")+'</div>';
+}
+function readNivs(){var o={},any=false;DISC_IDS.forEach(function(id){var el=document.getElementById("niv-"+id);if(!el)return;var v=+el.value;if(v>=0){o[id]=v;any=true}});return any?o:null}
+
+/* ============ Plakken ============ */
+function viewPlak(){
+  if(S.plakRes)return viewPlakRes();
+  var html='<h2>📋 Plakken uit Horse Nation</h2>';
+  html+='<div class="card"><p><b>Je stal:</b> ga in Horse Nation naar <b>Mijn stal</b>, selecteer alles, kopieer en plak het hieronder. Nieuwe paarden komen erbij, bestaande worden bijgewerkt (S/D/G, trainingsniveaus, drachtig).</p>';
+  html+='<p><b>Een stamboom:</b> kopieer de stamboom van een paard en plak hem hier. Dan weet de app de ouders en grootouders, voor de inteelt.</p>';
+  html+='<textarea id="plak" rows="7" placeholder="Plak hier…" onpaste="plakHtml(event)"></textarea>';
+  html+='<button class="big" onclick="doPlak()">✓ Toevoegen</button></div>';
+  return html;
+}
+function plakHtml(e){
+  var h=e.clipboardData&&e.clipboardData.getData("text/html");
+  if(h&&/<li/i.test(h)&&/\/horses\/\d+/.test(h)){var md="";try{md=hnHtmlToMd(h)}catch(er){}if(md&&hnParseTree(md)){e.preventDefault();document.getElementById("plak").value=md}}
+}
+function isoFromNl(d){var m=String(d||"").match(/(\d{1,2})-(\d{1,2})-(\d{4})/);return m?m[3]+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0"):""}
+function doPlak(){
+  var t=(document.getElementById("plak").value||"").trim();if(!t){info("Er staat nog niets in het vak.");return}
+  var st=null,tr=null;try{st=hnParseStal(t)}catch(e){}
+  if(st){plakStal(st);return}
+  try{tr=hnParseTree(t)}catch(e){}
+  if(tr){plakTree(tr);return}
+  info("Dit herken ik niet. Plak de pagina Mijn stal of de stamboom van een paard.");
+}
+function plakStal(st){
+  var nieuw=[],bij=[],drachtig=[],madeGroup=false,seen={};
+  st.rows.forEach(function(r){
+    seen[norm(r.name)]=1;
+    var h=D.horses.find(function(x){return norm(x.name)===norm(r.name)}),isNew=!h;
+    if(isNew){
+      var g=r.group?D.groups.find(function(x){return norm(x.name)===norm(r.group)}):null;
+      if(!g&&r.group){g={id:uid(),name:r.group};D.groups.push(g);madeGroup=true}
+      if(!g)g=D.groups.find(function(x){return norm(x.name)===(r.gender==="H"?"hengsten":"merries")})||D.groups[0];
+      h={id:uid(),name:r.name,groupId:g?g.id:"",sire:"",dam:"",note:""};D.horses.push(h);nieuw.push(r.name);
+    }else bij.push(r.name);
+    h.g=r.gender;if(r.ras)h.ras=r.ras;
+    if(r.S!==null)h.S=String(r.S);if(r.D!==null)h.D=String(r.D);if(r.G!==null)h.G=String(r.G);delete h.sdg;
+    if(r.age!==null)h.age=r.age;if(r.pred)h.pred=r.pred;
+    if(r.lv&&Object.keys(r.lv).length)h.niv=Object.assign({},h.niv||{},r.lv);
+    if(r.status&&/^drachtig/i.test(r.status)&&!h.bevalDatum&&h.g!=="H"){
+      var d=isoFromNl(r.dDate);if(d){h.bevalDatum=d<today()?addDays(d,DRACHT_DAGEN):d}else h.bevalDatum=addDays(today(),DRACHT_DAGEN);
+      h.drachtMet=h.drachtMet||"";drachtig.push(r.name);
+    }
+  });
+  if(madeGroup){D.groups=D.groups.filter(function(g){var standaard=/^(merries|hengsten)$/.test(norm(g.name));return !standaard||D.horses.some(function(h){return h.groupId===g.id})})}
+  var order=[];st.rows.forEach(function(r){var k=norm(r.group);if(k&&order.indexOf(k)<0)order.push(k)});
+  var pos=function(g){var i=order.indexOf(norm(g.name));return i<0?999:i};
+  D.groups=D.groups.map(function(g,i){return{g:g,i:i}}).sort(function(a,b){return pos(a.g)-pos(b.g)||a.i-b.i}).map(function(x){return x.g});
+  var weg=D.horses.filter(function(h){return !seen[norm(h.name)]&&!h.bevalDatum}).map(function(h){return h.id});
+  save();S.plakRes={type:"stal",nieuw:nieuw,bij:bij,drachtig:drachtig,weg:weg};render();window.scrollTo(0,0);
+}
+function plakTree(tr){
+  var n=0;
+  tr.nodes.forEach(function(nd){
+    if(!nd.name)return;
+    var rec={name:nd.name,g:nd.gender,ras:nd.ras||"",S:nd.S,D:nd.D,G:nd.G,sire:nd.sire?nd.sire.name:"",dam:nd.dam?nd.dam.name:""};
+    if(nd.S!==null&&nd.D!==null&&nd.G!==null)rec.sdg=nd.S+nd.D+nd.G;
+    var ex=D.ped.find(function(x){return norm(x.name)===norm(rec.name)});
+    if(ex){if(!ex.sire&&rec.sire)ex.sire=rec.sire;if(!ex.dam&&rec.dam)ex.dam=rec.dam;if(ex.sdg==null&&rec.sdg!=null){ex.sdg=rec.sdg}}else{D.ped.push(rec);n++}
+    var mine=D.horses.find(function(x){return norm(x.name)===norm(rec.name)});
+    if(mine){if(rec.sire)mine.sire=rec.sire;if(rec.dam)mine.dam=rec.dam}
+  });
+  var root=tr.root||tr.nodes[0];var mine=root&&D.horses.find(function(x){return norm(x.name)===norm(root.name)});
+  save();S.plakRes={type:"tree",root:root?root.name:"",mine:!!mine,n:tr.nodes.length};render();window.scrollTo(0,0);
+}
+function viewPlakRes(){
+  var r=S.plakRes,html='<h2>📋 Gelukt ✓</h2><div class="card">';
+  if(r.type==="tree"){
+    html+='<p>De stamboom van <b>'+esc(r.root)+'</b> is bewaard ('+r.n+' paarden).</p>';
+    html+=r.mine?'<p>Vader en moeder zijn bij '+esc(r.root)+' ingevuld.</p>':'<p class="muted">'+esc(r.root)+' staat niet bij je paarden, maar de stamboom telt wel mee voor de inteelt.</p>';
+  }else{
+    if(r.nieuw.length)html+='<p><b>Nieuw ('+r.nieuw.length+'):</b> '+r.nieuw.map(esc).join(", ")+'</p>';
+    if(r.bij.length)html+='<p><b>Bijgewerkt ('+r.bij.length+'):</b> '+r.bij.map(esc).join(", ")+'</p>';
+    if(r.drachtig.length)html+='<p><b>Drachtig gezet:</b> '+r.drachtig.map(esc).join(", ")+'. Kijk bij 🤰 Drachtig of de datum klopt en vul de hengst in.</p>';
+    var weg=r.weg.map(function(id){return D.horses.find(function(h){return h.id===id})}).filter(Boolean);
+    if(weg.length){html+='<p><b>Niet meer in je stal:</b> '+weg.map(function(h){return esc(h.name)}).join(", ")+'</p><button class="big red" onclick="plakWeg()">Deze '+weg.length+' weghalen</button>'}
+    var zonder=D.horses.filter(function(h){return !h.sire&&!h.dam}).length;
+    if(zonder)html+='<p class="muted">Bij '+zonder+' paarden zijn de ouders nog niet bekend. Plak hun stamboom, dan rekent de app de inteelt goed uit.</p>';
+  }
+  html+='<button class="big" onclick="go(\'paarden\')">Naar mijn paarden</button><button class="big light" onclick="S.plakRes=null;render()">Nog iets plakken</button></div>';
+  return html;
+}
+function plakWeg(){var ids=S.plakRes.weg;ask(ids.length+" paarden weghalen uit je stal?","Ja, weghalen",function(){D.horses=D.horses.filter(function(h){return ids.indexOf(h.id)<0});S.plakRes.weg=[];save();render();toast("Weggehaald")},true)}
+
+
+/* ============ Dropbox ============ */
+var DBX_KEY="kjix20vl6p7ds71", DBX_PATH="/stalboekje.json", DBX_TOK="stalboekje-dbx", DBX_SYNCED="stalboekje-dbx-synced", DBX_VER="stalboekje-dbx-verifier";
+var DBX={busy:false,msg:"",err:"",last:0,timer:null};
+function dbxTokens(){try{return JSON.parse(localStorage.getItem(DBX_TOK)||"null")}catch(e){return null}}
+function dbxSetTokens(t){try{if(t)localStorage.setItem(DBX_TOK,JSON.stringify(t));else localStorage.removeItem(DBX_TOK)}catch(e){}}
+function dbxOn(){var t=dbxTokens();return !!(t&&t.refresh_token)}
+function dbxSynced(){try{return +localStorage.getItem(DBX_SYNCED)||0}catch(e){return 0}}
+function dbxSetSynced(v){try{localStorage.setItem(DBX_SYNCED,String(v))}catch(e){}}
+function dbxRedirect(){return location.origin+location.pathname}
+function b64url(buf){var s="",b=new Uint8Array(buf);for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+async function dbxConnect(){
+  var r=new Uint8Array(48);crypto.getRandomValues(r);var ver=b64url(r);
+  try{localStorage.setItem(DBX_VER,ver)}catch(e){}
+  var ch=b64url(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(ver)));
+  var q=new URLSearchParams({client_id:DBX_KEY,response_type:"code",code_challenge:ch,code_challenge_method:"S256",token_access_type:"offline",redirect_uri:dbxRedirect()});
+  location.href="https://www.dropbox.com/oauth2/authorize?"+q.toString();
+}
+async function dbxErrText(res){try{var t=await res.text();try{var j=JSON.parse(t);return j.error_summary||j.error_description||t}catch(e){return t}}catch(e){return res.statusText}}
+async function dbxFinishLogin(code){
+  var ver="";try{ver=localStorage.getItem(DBX_VER)||""}catch(e){}
+  var res=await fetch("https://api.dropboxapi.com/oauth2/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({code:code,grant_type:"authorization_code",client_id:DBX_KEY,code_verifier:ver,redirect_uri:dbxRedirect()}).toString()});
+  if(!res.ok)throw new Error("Inloggen bij Dropbox lukte niet ("+res.status+"): "+await dbxErrText(res));
+  var o=await res.json();dbxSetTokens({access_token:o.access_token,refresh_token:o.refresh_token,expires_at:Date.now()+(o.expires_in-60)*1000});
+  try{localStorage.removeItem(DBX_VER)}catch(e){}
+}
+async function dbxToken(){
+  var t=dbxTokens();if(!t)throw new Error("Niet verbonden met Dropbox.");
+  if(t.access_token&&t.expires_at>Date.now())return t.access_token;
+  var res=await fetch("https://api.dropboxapi.com/oauth2/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams({grant_type:"refresh_token",refresh_token:t.refresh_token,client_id:DBX_KEY}).toString()});
+  if(!res.ok){if(res.status===400||res.status===401){dbxSetTokens(null);throw new Error("De koppeling met Dropbox is verlopen. Verbind opnieuw.")}throw new Error("Dropbox reageert niet ("+res.status+").")}
+  var o=await res.json();t.access_token=o.access_token;t.expires_at=Date.now()+(o.expires_in-60)*1000;dbxSetTokens(t);return t.access_token;
+}
+async function dbxDownload(){
+  var tok=await dbxToken();
+  var res=await fetch("https://content.dropboxapi.com/2/files/download",{method:"POST",headers:{Authorization:"Bearer "+tok,"Dropbox-API-Arg":JSON.stringify({path:DBX_PATH})}});
+  if(res.status===409){var e=await dbxErrText(res);if(String(e).indexOf("not_found")>=0)return null;throw new Error("Ophalen uit Dropbox lukte niet: "+e)}
+  if(!res.ok)throw new Error("Ophalen uit Dropbox lukte niet ("+res.status+").");
+  return JSON.parse(await res.text());
+}
+async function dbxUpload(data){
+  var tok=await dbxToken();
+  var res=await fetch("https://content.dropboxapi.com/2/files/upload",{method:"POST",headers:{Authorization:"Bearer "+tok,"Dropbox-API-Arg":JSON.stringify({path:DBX_PATH,mode:"overwrite",mute:true}),"Content-Type":"application/octet-stream"},body:JSON.stringify(data)});
+  if(!res.ok)throw new Error("Opslaan in Dropbox lukte niet ("+res.status+"): "+await dbxErrText(res));
+}
+function dbxApply(x){
+  try{localStorage.setItem("stalboekje-voor-dropbox",localStorage.getItem(KEY)||"")}catch(e){}
+  x.db=x.db||[];x.ped=x.ped||[];x.rassen=x.rassen||["fries"];D=x;
+  try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}
+  dbxSetSynced(D.t||0);
+}
+async function dbxSync(){
+  if(!dbxOn()||DBX.busy)return;DBX.busy=true;DBX.err="";dbxBar();
+  try{
+    var remote=await dbxDownload(),lt=D.t||0,synced=dbxSynced();
+    if(!remote){await dbxUpload(D);dbxSetSynced(lt)}
+    else{
+      var rt=remote.t||0,lh=(D.horses||[]).length,rh=(remote.horses||[]).length;
+      if(rt===lt){dbxSetSynced(lt)}
+      else if(!synced){
+        if(!lh&&!D.db.length){dbxApply(remote);render()}
+        else if(!rh&&!(remote.db||[]).length){await dbxUpload(D);dbxSetSynced(lt)}
+        else{DBX.busy=false;dbxConflict(remote);return}
+      }else{
+        var lc=lt>synced,rc=rt>synced;
+        if(lc&&rc){DBX.busy=false;dbxConflict(remote);return}
+        if(rc){dbxApply(remote);render()}
+        else if(lc){await dbxUpload(D);dbxSetSynced(lt)}
+      }
+    }
+    DBX.last=Date.now();
+  }catch(e){DBX.err=e.message||"Er ging iets mis met Dropbox."}
+  DBX.busy=false;dbxBar();if(S.tab==="backup"&&!S.edit)render();
+}
+function dbxConflict(remote){
+  dialog("Er is iets veranderd op dit apparaat én op een ander apparaat. Welke wil je houden?\n\nDit apparaat: "+D.horses.length+" paarden\nDropbox: "+(remote.horses||[]).length+" paarden",[
+    {t:"Die van dit apparaat",f:function(){DBX.busy=true;dbxUpload(D).then(function(){dbxSetSynced(D.t||0);DBX.last=Date.now()}).catch(function(e){DBX.err=e.message}).then(function(){DBX.busy=false;dbxBar();render()})}},
+    {t:"Die uit Dropbox",cls:"light",f:function(){dbxApply(remote);DBX.last=Date.now();dbxBar();render()}}]);
+}
+function dbxLater(){if(!dbxOn())return;clearTimeout(DBX.timer);DBX.timer=setTimeout(dbxSync,2000)}
+function dbxBar(){
+  var el=document.getElementById("cloud");if(!el)return;
+  if(!dbxOn()){el.innerHTML="";return}
+  el.innerHTML=DBX.err?'<span class="pill bad" onclick="go(\'backup\')">☁️ Dropbox: probleem, tik hier</span>':DBX.busy?'<span class="pill">☁️ Bezig met Dropbox…</span>':'<span class="pill ok">☁️ Dropbox ✓</span>';
+}
+function dbxDisconnect(){ask("Dropbox loskoppelen? Je paarden blijven op dit apparaat staan.","Ja, loskoppelen",function(){dbxSetTokens(null);dbxSetSynced(0);DBX.err="";dbxBar();render()})}
+function viewDropbox(){
+  var html='<h2>☁️ Dropbox</h2><div class="card">';
+  if(!dbxOn()){
+    html+='<p>Met Dropbox staan je paarden veilig in je eigen Dropbox, en zie je dezelfde paarden op je telefoon, tablet en computer.</p>';
+    if(DBX.err)html+='<p class="pill bad">'+esc(DBX.err)+'</p>';
+    html+='<button class="big" onclick="dbxConnect()">Verbinden met Dropbox</button><p class="muted">Je logt in met je eigen Dropbox. Doe dit op elk apparaat waarop je het Stalboekje gebruikt.</p>';
+  }else{
+    html+='<p>✓ Verbonden. Alles wat je verandert gaat vanzelf naar Dropbox.</p>';
+    if(DBX.err)html+='<p class="pill bad" style="white-space:normal">'+esc(DBX.err)+'</p>';
+    else if(DBX.last)html+='<p class="muted">Laatst bijgewerkt om '+new Date(DBX.last).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"})+'.</p>';
+    html+='<button class="big light" onclick="dbxSync()">🔄 Nu bijwerken</button><button class="link" onclick="dbxDisconnect()">Loskoppelen</button>';
+  }
+  return html+'</div>';
+}
+async function dbxStart(){
+  var u=new URL(location.href),code=u.searchParams.get("code"),err=u.searchParams.get("error");
+  if(code||err){u.searchParams.delete("code");u.searchParams.delete("state");u.searchParams.delete("error");u.searchParams.delete("error_description");history.replaceState({},"",u.pathname+u.search+u.hash)}
+  if(code){try{await dbxFinishLogin(code);toast("Verbonden met Dropbox ✓")}catch(e){DBX.err=e.message}}
+  if(err)DBX.err="Verbinden met Dropbox is afgebroken.";
+  dbxBar();if(dbxOn())dbxSync();
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")dbxSync()});
+}
+
+/* ============ Schermen ============ */
+var TABS=[["paarden","🐴","Paarden"],["dekken","💞","Dekken"],["dracht","🤰","Drachtig"],["plakken","📋","Plakken"],["backup","💾","Back-up"]];
+var S={tab:"paarden",edit:null,mare:null,dek:null,foal:null,q:"",tree:null,plakRes:null};
+function go(t){S={tab:t,edit:null,mare:null,dek:null,foal:null,q:"",tree:null,plakRes:null};render();window.scrollTo(0,0)}
+function render(){
+  document.getElementById("tabs").innerHTML=TABS.map(function(t){
+    var badge="";if(t[0]==="dracht"){var n=D.horses.filter(function(h){return h.bevalDatum}).length;if(n)badge=" ("+n+")"}
+    return '<button class="tab'+(S.tab===t[0]?" on":"")+'" onclick="go(\''+t[0]+'\')"><span class="ic">'+t[1]+'</span>'+t[2]+badge+'</button>'}).join("");
+  var m=document.getElementById("main");
+  if(S.tab==="paarden")m.innerHTML=S.tree?viewTree():S.edit?viewEdit():viewPaarden();
+  else if(S.tab==="dekken")m.innerHTML=S.dek?viewDekBevestig():S.mare?viewHengsten():viewKiesMerrie();
+  else if(S.tab==="dracht")m.innerHTML=S.foal?viewBevallen():viewDracht();
+  else if(S.tab==="plakken")m.innerHTML=viewPlak();
+  else m.innerHTML=viewBackup();
+}
+
+/* ---- Mijn paarden (kladblok) ---- */
+function horseRow(h){
+  var sd=sdgOf(h),tag="";
+  if(h.bevalDatum)tag=' <span class="pill">🤰 '+nlDate(h.bevalDatum)+'</span>';
+  return '<button class="horse" onclick="openHorse(\''+h.id+'\')"><span class="sx">'+(h.g==="H"?"♂":"♀")+'</span><span class="nm">'+esc(h.name||"(zonder naam)")+tag+(fokLine(h,true)?'<span class="sub">'+fokLine(h,true)+'</span>':'')+(h.note?'<span class="sub muted">'+esc(h.note)+'</span>':'')+'</span><span class="pill">'+f1(sd)+'</span></button>';
+}
+function viewPaarden(){
+  var q=norm(S.q),html='';
+  if(D.horses.length>6)html+='<input class="search" placeholder="🔍 Zoek een paard…" value="'+esc(S.q)+'" oninput="S.q=this.value;renderList()">';
+  html+='<div id="list">'+listHtml(q)+'</div>';
+  html+='<button class="big" onclick="newHorse()">+ Paard toevoegen</button>';
+  html+='<button class="big light" onclick="newGroup()">+ Groep toevoegen</button>';
+  return html;
+}
+function renderList(){document.getElementById("list").innerHTML=listHtml(norm(S.q))}
+function listHtml(q){
+  if(!D.horses.length)return '<div class="empty">Nog geen paarden.<br>Plak je stal bij <b>📋 Plakken</b>, of tik op <b>+ Paard toevoegen</b>.</div>';
+  var html='';
+  D.groups.forEach(function(g,gi){
+    var hs=D.horses.filter(function(h){return h.groupId===g.id&&(!q||norm(h.name).indexOf(q)>=0)}).sort(function(a,b){return (sdgOf(b)||0)-(sdgOf(a)||0)});
+    if(q&&!hs.length)return;
+    html+='<div class="group-h"><h2>'+esc(g.name)+' <span class="muted">('+hs.length+')</span></h2><button class="small" onclick="groupMenu(\''+g.id+'\')">✏️</button></div>';
+    html+=hs.length?hs.map(horseRow).join(""):'<p class="muted">Nog leeg.</p>';
+  });
+  var loose=D.horses.filter(function(h){return !D.groups.some(function(g){return g.id===h.groupId})&&(!q||norm(h.name).indexOf(q)>=0)});
+  if(loose.length)html+='<div class="group-h"><h2>Zonder groep</h2></div>'+loose.map(horseRow).join("");
+  return html;
+}
+function newGroup(){dialog("Naam van de nieuwe groep:",[{t:"Toevoegen",f:function(n){if(!n.trim())return;D.groups.push({id:uid(),name:n.trim()});save();render()}},{t:"Annuleren",cls:"light"}],{value:""})}
+function groupMenu(id){
+  var g=D.groups.find(function(x){return x.id===id});if(!g)return;
+  dialog("Groep \""+g.name+"\"",[
+    {t:"Naam opslaan",f:function(n){if(!n.trim())return;g.name=n.trim();save();render()}},
+    {t:"Groep weghalen",cls:"red",f:function(){
+      var cnt=D.horses.filter(function(h){return h.groupId===id}).length;
+      if(cnt){info("Er staan nog "+cnt+" paarden in deze groep. Zet ze eerst in een andere groep.");return}
+      ask("Groep \""+g.name+"\" weghalen?","Ja, weghalen",function(){D.groups=D.groups.filter(function(x){return x.id!==id});save();render()},true)}},
+    {t:"Annuleren",cls:"light"}],{value:g.name});
+}
+function newHorse(){S.edit={id:null,name:"",g:"M",S:"",D:"",G:"",sire:"",dam:"",groupId:(D.groups[0]||{}).id||"",note:""};render();window.scrollTo(0,0)}
+function openHorse(id){var h=D.horses.find(function(x){return x.id===id});if(!h)return;S.edit=JSON.parse(JSON.stringify(h));render();window.scrollTo(0,0)}
+function viewEdit(){
+  var h=S.edit,isNew=!h.id;
+  var names=Array.from(byName().values()).map(function(x){return x.name}).sort();
+  var html='<button class="link back" onclick="S.edit=null;render()">← Terug naar mijn paarden</button>';
+  html+='<div class="card"><h2 style="margin-top:0">'+(isNew?"Nieuw paard":esc(h.name))+'</h2>';
+  html+='<label>Naam</label><input id="f-name" value="'+esc(h.name)+'" autocomplete="off">';
+  html+='<label>Merrie of hengst?</label><div class="seg"><button id="sx-M" class="'+(h.g!=="H"?"on":"")+'" onclick="setSx(\'M\')">♀ Merrie</button><button id="sx-H" class="'+(h.g==="H"?"on":"")+'" onclick="setSx(\'H\')">♂ Hengst</button></div>';
+  html+='<label>S / D / G</label><div class="row"><input id="f-S" inputmode="decimal" placeholder="S" value="'+esc(h.S)+'"><input id="f-D" inputmode="decimal" placeholder="D" value="'+esc(h.D)+'"><input id="f-G" inputmode="decimal" placeholder="G" value="'+esc(h.G)+'"></div>';
+  html+='<label>Vader</label><input id="f-sire" list="names" value="'+esc(h.sire)+'" autocomplete="off">';
+  html+='<label>Moeder</label><input id="f-dam" list="names" value="'+esc(h.dam)+'" autocomplete="off">';
+  html+='<datalist id="names">'+names.map(function(n){return '<option value="'+esc(n)+'">'}).join("")+'</datalist>';
+  html+='<label>Groep</label><select id="f-group">'+D.groups.map(function(g){return '<option value="'+g.id+'"'+(g.id===h.groupId?" selected":"")+'>'+esc(g.name)+'</option>'}).join("")+'</select>';
+  html+='<label>Notitie</label><textarea id="f-note">'+esc(h.note)+'</textarea>';
+  html+='<h2>Fokbonus</h2>'+(isNew?'':'<div>'+fokLine(h,false)+'</div>')+'<p class="muted">Trainingsniveaus (worden ingevuld als je je stal plakt):</p>'+nivSelects(h)+FOK_UITLEG;
+  if(h.g==="H")html+='<label style="font-weight:400"><input type="checkbox" id="f-geendek" style="width:auto;margin-right:8px"'+(h.geenDek?" checked":"")+'>Niet gebruiken om mee te dekken</label>';
+  html+='<button class="big" onclick="saveHorse()">💾 Opslaan</button>';
+  if(!isNew){
+    html+='<button class="big light" onclick="S.tree=S.edit.name;render();window.scrollTo(0,0)">🌳 Stamboom bekijken</button>';
+    if(h.bevalDatum)html+='<p class="muted">🤰 Drachtig van '+esc(h.drachtMet)+', bevalt rond '+nlDate(h.bevalDatum)+'.</p>';
+    html+='<button class="big red" onclick="delHorse()">Paard weghalen</button>';
+  }
+  html+='</div>';
+  return html;
+}
+function setSx(x){S.edit.g=x;document.getElementById("sx-M").className=x==="M"?"on":"";document.getElementById("sx-H").className=x==="H"?"on":""}
+function val(id){var el=document.getElementById(id);return el?el.value.trim():""}
+function saveHorse(){
+  var h=S.edit;h.name=val("f-name");
+  if(!h.name){info("Vul eerst een naam in.");return}
+  var dup=D.horses.find(function(x){return x.id!==h.id&&norm(x.name)===norm(h.name)});
+  if(dup&&!S.dupOk){ask("Er staat al een paard met de naam \""+dup.name+"\". Toch opslaan?","Ja, toch opslaan",function(){S.dupOk=1;saveHorse();S.dupOk=0});return}
+  h.S=val("f-S");h.D=val("f-D");h.G=val("f-G");h.sire=val("f-sire");h.dam=val("f-dam");h.groupId=val("f-group");h.note=val("f-note");
+  var nv=readNivs();if(nv)h.niv=nv;else delete h.niv;
+  var gd=document.getElementById("f-geendek");h.geenDek=gd?gd.checked:false;
+  if(h.g!=="H")h.geenDek=false;
+  if(!h.id){h.id=uid();D.horses.push(h)}else{var i=D.horses.findIndex(function(x){return x.id===h.id});D.horses[i]=h}
+  save();S.edit=null;render();toast("Opgeslagen ✓");
+}
+function delHorse(){
+  ask("\""+S.edit.name+"\" echt weghalen uit je stal?","Ja, weghalen",function(){
+  D.horses=D.horses.filter(function(x){return x.id!==S.edit.id});save();S.edit=null;render();toast("Weggehaald")},true);
+}
+function viewTree(){
+  var map=byName(),name=S.tree,h=find(map,name);
+  var html='<button class="link back" onclick="S.tree=null;render()">← Terug</button><div class="card"><h2 style="margin-top:0">🌳 Stamboom van '+esc(name)+'</h2><div class="tree">';
+  function line(nm,lvl,rol){var x=find(map,nm);return '<div class="lv'+lvl+'">'+rol+' <b>'+(nm?esc(nm):'<span class="muted">onbekend</span>')+'</b>'+(x&&sdgOf(x)!==null?' <span class="muted">'+f1(sdgOf(x))+'</span>':'')+'</div>'}
+  if(!h||(!h.sire&&!h.dam))html+='<p class="muted">Geen ouders bekend.</p>';
+  else{
+    [["sire","Vader"],["dam","Moeder"]].forEach(function(p){
+      var n1=h[p[0]];html+=line(n1,1,p[1]+":");var x=find(map,n1);
+      if(x){[["sire","Vader"],["dam","Moeder"]].forEach(function(q){var n2=x[q[0]];html+=line(n2,2,"└ "+q[1]+":");var y=find(map,n2);if(y){html+=line(y.sire,3,"└ Vader:");html+=line(y.dam,3,"└ Moeder:")}})}
+    });
+  }
+  return html+'</div></div>';
+}
+
+/* ---- Dekken ---- */
+function viewKiesMerrie(){
+  var mares=D.horses.filter(function(h){return h.g!=="H"});
+  var vrij=mares.filter(function(h){return !h.bevalDatum}).sort(function(a,b){return (sdgOf(b)||0)-(sdgOf(a)||0)});
+  var html='<h2>Welke merrie wil je dekken?</h2>'+FOK_UITLEG;
+  if(!mares.length)return html+'<div class="empty">Je hebt nog geen merries.<br>Voeg ze toe bij <b>🐴 Mijn paarden</b>.</div>';
+  if(!vrij.length)html+='<div class="empty">Al je merries zijn drachtig. 🎉</div>';
+  html+=vrij.map(function(h){return '<button class="horse" onclick="S.mare=\''+h.id+'\';render();window.scrollTo(0,0)"><span class="sx">♀</span><span class="nm">'+esc(h.name)+(fokLine(h,true)?'<span class="sub">'+fokLine(h,true)+'</span>':'')+'</span><span class="pill">'+f1(sdgOf(h))+'</span></button>'}).join("");
+  if(!D.db.length)html+='<p class="muted" style="margin-top:16px">Tip: lees bij <b>💾 Back-up</b> het hengstenbestand in, dan zie je hier ook de dekhengsten van andere stallen.</p>';
+  return html;
+}
+function viewHengsten(){
+  var mare=D.horses.find(function(h){return h.id===S.mare});if(!mare){S.mare=null;return viewKiesMerrie()}
+  var map=byName(),msdg=sdgOf(mare);
+  var rows=stallions().map(function(x){
+    var st=x.h,c=coi(st.name,mare.name,map),rel=relation(st,mare,map);
+    var stDb=find(map,st.name)||st;
+    return {x:x,st:st,stDb:stDb,F:c.F,shared:c.shared,rel:rel,sdg:sdgOf(st),onbekend:!(stDb.sire||stDb.dam)};
+  });
+  var q=norm(S.q);if(q)rows=rows.filter(function(r){return norm(r.st.name).indexOf(q)>=0||norm(r.st.stal).indexOf(q)>=0});
+  rows.sort(function(a,b){var fa=a.rel||a.F>0?1:0,fb=b.rel||b.F>0?1:0;return fa-fb||(b.sdg||0)-(a.sdg||0)});
+  var html='<button class="link back" onclick="S.mare=null;S.q=\'\';render()">← Andere merrie kiezen</button>';
+  html+='<div class="card"><b>♀ '+esc(mare.name)+'</b> · '+f1(msdg)+' SDG<div class="info">'+fokLine(mare,false)+'</div>'+(mare.sire||mare.dam?'<br><span class="muted">'+esc(mare.sire||"?")+' × '+esc(mare.dam||"?")+'</span>':'<br><span class="muted">Ouders niet ingevuld, dus de inteelt kan niet goed berekend worden.</span>')+'</div>';
+  html+='<input class="search" placeholder="🔍 Zoek een hengst of stal…" value="'+esc(S.q)+'" oninput="S.q=this.value;var p=this.selectionStart;render();var e=document.querySelector(\'.search\');e.focus();e.setSelectionRange(p,p)">';
+  if(!rows.length)return html+'<div class="empty">Geen dekhengsten gevonden.<br>Lees bij <b>💾 Back-up</b> het hengstenbestand in.</div>';
+  html+='<p class="muted">Bovenaan staan de hengsten zonder inteelt, de hoogste SDG eerst.</p>';
+  S.rows=rows;
+  rows.forEach(function(r,i){
+    var fam=r.rel||r.F>0,veulen=(r.sdg!==null&&msdg!==null)?(r.sdg+msdg)/2:null;
+    html+='<div class="stal'+(i===0&&!fam?" best":"")+(fam?" fam":"")+'"><div class="top"><span class="nm">♂ '+esc(r.st.name)+'</span><span class="sdg">'+f1(r.sdg)+'</span></div>';
+    html+='<div class="info">'+(r.x.eigen?"Eigen hengst":r.st.eigen?"Uit de Stalmanager":(r.st.stal?"Stal: "+esc(r.st.stal):""))+(r.st.dekgeld?" · Dekgeld: "+esc(r.st.dekgeld):"")+'</div>';
+    html+='<div>'+coiPill(r.F)+' '+fokLine(r.st.niv||r.st.fok?r.st:r.stDb,true)+(r.rel?' <span class="pill bad">⚠️ '+esc(r.rel)+'</span>':'')+'</div>';
+    if(r.F>0&&r.shared.length)html+='<div class="info">Zelfde voorouder: '+r.shared.slice(0,2).map(function(s){return esc(s.name)}).join(", ")+'</div>';
+    if(r.onbekend)html+='<div class="info">Stamboom van deze hengst is onbekend.</div>';
+    if(veulen!==null)html+='<div class="info">Veulen wordt minstens ongeveer <b>'+f1(veulen)+'</b> SDG</div>';
+    html+='<button class="big" onclick="kiesHengst('+i+')">Gedekt met '+esc(r.st.name)+'</button></div>';
+  });
+  return html;
+}
+function kiesHengst(i){S.dek=S.rows[i].st.name;render();window.scrollTo(0,0)}
+function viewDekBevestig(){
+  var mare=D.horses.find(function(h){return h.id===S.mare});
+  var html='<button class="link back" onclick="S.dek=null;render()">← Terug</button><div class="card"><h2 style="margin-top:0">💞 '+esc(mare.name)+' × '+esc(S.dek)+'</h2>';
+  html+='<label>Wanneer gedekt?</label><input type="date" id="f-dekdatum" value="'+today()+'">';
+  html+='<p class="muted">De app rekent '+DRACHT_DAGEN+' dagen dracht. Je kunt de bevaldatum later nog aanpassen.</p>';
+  html+='<button class="big" onclick="bevestigDek()">✓ Ja, ze is gedekt</button></div>';
+  return html;
+}
+function bevestigDek(){
+  var mare=D.horses.find(function(h){return h.id===S.mare});var d=val("f-dekdatum")||today();
+  mare.drachtMet=S.dek;mare.dekDatum=d;mare.bevalDatum=addDays(d,DRACHT_DAGEN);
+  save();toast(mare.name+" is gedekt 💞");go("dracht");
+}
+
+/* ---- Drachtig ---- */
+function viewDracht(){
+  var list=D.horses.filter(function(h){return h.bevalDatum}).sort(function(a,b){return a.bevalDatum.localeCompare(b.bevalDatum)});
+  var html='<h2>Drachtige merries</h2><p class="muted">De fokbonus telt op de dag van de bevalling. Haalt de merrie of hengst hem vóór die dag, dan telt hij nog mee.</p>';
+  if(!list.length)return html+'<div class="empty">Er zijn nu geen drachtige merries.<br>Dekken doe je bij <b>💞 Dekken</b>.</div>';
+  list.forEach(function(h){
+    var n=daysUntil(h.bevalDatum),txt=n>1?"nog "+n+" dagen":n===1?"morgen":n===0?"vandaag!":"al "+(-n)+" dag"+(n===-1?"":"en")+" over tijd";
+    var mare=sdgOf(h),st=find(byName(),h.drachtMet),v=(mare!==null&&st&&sdgOf(st)!==null)?(mare+sdgOf(st))/2:null;
+    html+='<div class="stal"><div class="top"><span class="nm">♀ '+esc(h.name)+'</span><span class="days">'+txt+'</span></div>';
+    html+='<div class="info">'+(h.drachtMet?'Van '+esc(h.drachtMet)+' · bevalt':'Bevalt')+' rond <b>'+nlDate(h.bevalDatum)+'</b>'+(v!==null?' · veulen ≥ '+f1(v)+' SDG':'')+'</div>';
+    var stH=find(byName(),h.drachtMet);
+    html+='<div class="info">Fokbonus nu: merrie '+fokLine(h,true)+(h.drachtMet?' hengst '+(stH?fokLine(stH,true)||'<span class="pill">onbekend</span>':'<span class="pill">onbekend</span>'):'')+'</div>';
+    var fm=fokInfo(h);if(fm.known&&!fm.full&&fm.next&&fm.next.steps.length)html+='<div class="info">💡 Wil je dat '+esc(h.name)+' de volle fokbonus meegeeft? Train dan vóór '+nlDate(h.bevalDatum)+' nog: <b>'+fm.next.steps.map(esc).join(", ")+'</b></div>';
+    if(!h.drachtMet)html+='<div class="info">Hengst nog niet ingevuld. <button class="link" onclick="setHengst(\''+h.id+'\')">Invullen</button></div>';
+    html+='<button class="big" onclick="S.foal={id:\''+h.id+'\',g:\'M\'};render();window.scrollTo(0,0)">🎉 Bevallen</button>';
+    html+='<div class="row"><button class="link" onclick="changeDate(\''+h.id+'\')">Datum aanpassen</button><button class="link" style="text-align:right" onclick="nietDrachtig(\''+h.id+'\')">Toch niet drachtig</button></div></div>';
+  });
+  return html;
+}
+function setHengst(id){var h=D.horses.find(function(x){return x.id===id});dialog("Met welke hengst is "+h.name+" gedekt?",[{t:"Opslaan",f:function(n){if(!n.trim())return;h.drachtMet=n.trim();save();render()}},{t:"Annuleren",cls:"light"}],{value:""})}
+function changeDate(id){var h=D.horses.find(function(x){return x.id===id});dialog("Wanneer bevalt "+h.name+"?",[{t:"Opslaan",f:function(n){if(!/^\d{4}-\d{2}-\d{2}$/.test(n))return;h.bevalDatum=n;save();render()}},{t:"Annuleren",cls:"light"}],{type:"date",value:h.bevalDatum})}
+function nietDrachtig(id){var h=D.horses.find(function(x){return x.id===id});ask(h.name+" is toch niet drachtig?","Klopt, niet drachtig",function(){delete h.drachtMet;delete h.dekDatum;delete h.bevalDatum;save();render()})}
+function viewBevallen(){
+  var mare=D.horses.find(function(h){return h.id===S.foal.id});
+  var vg=D.groups.find(function(g){return norm(g.name).indexOf("veulen")===0})||D.groups[0];
+  var html='<button class="link back" onclick="S.foal=null;render()">← Terug</button><div class="card"><h2 style="margin-top:0">🎉 Veulen van '+esc(mare.name)+'</h2>';
+  html+='<p class="muted">Vader: '+esc(mare.drachtMet||"onbekend")+'</p>';
+  html+='<label>Naam van het veulen</label><input id="f-name" autocomplete="off">';
+  html+='<label>Merrie of hengst?</label><div class="seg"><button id="sx-M" class="on" onclick="S.foal.g=\'M\';this.className=\'on\';document.getElementById(\'sx-H\').className=\'\'">♀ Merrie</button><button id="sx-H" onclick="S.foal.g=\'H\';this.className=\'on\';document.getElementById(\'sx-M\').className=\'\'">♂ Hengst</button></div>';
+  html+='<label>S / D / G</label><div class="row"><input id="f-S" inputmode="decimal" placeholder="S"><input id="f-D" inputmode="decimal" placeholder="D"><input id="f-G" inputmode="decimal" placeholder="G"></div>';
+  html+='<label>In welke groep?</label><select id="f-group">'+D.groups.map(function(g){return '<option value="'+g.id+'"'+(vg&&g.id===vg.id?" selected":"")+'>'+esc(g.name)+'</option>'}).join("")+'</select>';
+  html+='<button class="big" onclick="saveFoal()">💾 Veulen opslaan</button></div>';
+  return html;
+}
+function saveFoal(){
+  var mare=D.horses.find(function(h){return h.id===S.foal.id});var name=val("f-name");
+  if(!name){info("Geef het veulen eerst een naam.");return}
+  D.horses.push({id:uid(),name:name,g:S.foal.g,S:val("f-S"),D:val("f-D"),G:val("f-G"),sire:mare.drachtMet,dam:mare.name,groupId:val("f-group"),note:"geboren "+nlDate(today())});
+  delete mare.drachtMet;delete mare.dekDatum;delete mare.bevalDatum;
+  save();toast("Welkom "+name+"! 🐴");go("paarden");
+}
+
+/* ---- Back-up ---- */
+function viewBackup(){
+  var nSt=stallions().filter(function(x){return !x.eigen}).length;
+  var html=viewDropbox()+'<h2>🐎 Hengstenbestand</h2><div class="card">';
+  html+='<p>Lees hier het back-upbestand (.json) van de Stalmanager in. Daarmee krijg je de dekhengsten en de stambomen, zodat de app de inteelt kan uitrekenen.</p>';
+  html+=D.db.length?'<p><b>Ingelezen op '+esc(D.dbDate)+'</b>: '+D.db.length+' paarden, waarvan '+nSt+' dekhengsten.</p>':'<p class="muted">Nog niets ingelezen.</p>';
+  html+='<button class="big" onclick="document.getElementById(\'f-db\').click()">📂 Hengstenbestand inlezen</button><input type="file" id="f-db" accept=".json,application/json" style="display:none" onchange="importDb(this)">';
+  html+='<p class="muted">Je eigen paarden blijven gewoon staan. Krijg je een nieuwer bestand, lees het dan opnieuw in.</p></div>';
+  html+='<h2>💾 Mijn eigen back-up</h2><div class="card">';
+  html+='<p>Alles staat in de browser op dit apparaat. Maak af en toe een back-up, dan raak je niets kwijt.</p>';
+  html+='<button class="big" onclick="exportMine()">⬇️ Back-up downloaden</button>';
+  html+='<button class="big light" onclick="document.getElementById(\'f-mine\').click()">⬆️ Back-up terugzetten</button><input type="file" id="f-mine" accept=".json,application/json" style="display:none" onchange="importMine(this)">';
+  html+='</div>';
+  var rasList=Array.from(new Set(D.db.map(function(h){return norm(h.ras)}).filter(Boolean)));
+  if(rasList.length>1){
+    html+='<h2>🐴 Rassen</h2><div class="card"><p>Van welke rassen wil je dekhengsten zien?</p>';
+    S.rasList=rasList.sort();rasList.forEach(function(r,i){var on=D.rassen.some(function(x){return r.indexOf(x)===0});html+='<label style="font-weight:400"><input type="checkbox" style="width:auto;margin-right:8px"'+(on?" checked":"")+' onchange="toggleRas('+i+',this.checked)">'+esc(r.charAt(0).toUpperCase()+r.slice(1))+'</label>'});
+    html+='</div>';
+  }
+  return html;
+}
+function toggleRas(i,on){var r=S.rasList[i];D.rassen=D.rassen.filter(function(x){return r.indexOf(x)!==0&&x!==r});if(on)D.rassen.push(r);save();render()}
+function readFile(input,cb){var f=input.files&&input.files[0];input.value="";if(!f)return;var r=new FileReader();r.onload=function(){try{cb(JSON.parse(r.result))}catch(e){info("Dit bestand kon ik niet lezen. Is het een .json-bestand?")}};r.readAsText(f)}
+function importDb(input){
+  readFile(input,function(x){
+    if(!x||(!Array.isArray(x.groups)&&!Array.isArray(x.externalHorses))){info("Dit lijkt geen back-up van de Stalmanager.");return}
+    var out=[],seen={};
+    function add(h,eigen){
+      if(!h||!h.name||!String(h.name).trim())return;
+      var S_=num(h.sdgS),D_=num(h.sdgD),G_=num(h.sdgG),tot=num(h.sdg);
+      var dek=eigen?(h.gender==="H"&&h.status==="heart"):(h.dekhengst===true&&h.status!=="cross"&&h.status!=="warn");
+      var k=norm(h.name)+"|"+norm(h.stalnaam||h.stal||"");
+      var rec={name:String(h.name).trim(),g:h.gender==="H"?"H":"M",ras:h.ras||"",S:S_,D:D_,G:G_,sdg:tot!==null?tot:(S_!==null||D_!==null||G_!==null?(S_||0)+(D_||0)+(G_||0):null),sire:h.sireName||"",dam:h.damName||"",stal:eigen?"":(h.stal||""),dekgeld:h.dekgeld?String(h.dekgeld):"",dek:!!dek,eigen:!!eigen,niv:h.niveaus||null,fok:!!(h.fokbonus||h.allround)};
+      if(seen[k]!==undefined){var o=out[seen[k]];if(!o.sire&&rec.sire)o.sire=rec.sire;if(!o.dam&&rec.dam)o.dam=rec.dam;if(rec.dek)o.dek=true;return}
+      seen[k]=out.length;out.push(rec);
+    }
+    (x.groups||[]).forEach(function(g){(g.subgroups||[]).forEach(function(sg){(sg.items||[]).forEach(function(it){if(it.kind==="horse")add(it,true)})})});
+    (x.externalHorses||[]).forEach(function(h){add(h,false)});
+    D.db=out;D.dbDate=nlDate(today());save();render();
+    var n=stallions().filter(function(s){return !s.eigen}).length;
+    toast(out.length+" paarden ingelezen, "+n+" dekhengsten ✓");
+  });
+}
+function exportMine(){
+  var b=new Blob([JSON.stringify({stalboekje:1,groups:D.groups,horses:D.horses,ped:D.ped,rassen:D.rassen},null,1)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="stalboekje-backup-"+today()+".json";document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function importMine(input){
+  readFile(input,function(x){
+    if(!x||!x.stalboekje||!Array.isArray(x.horses)){info("Dit is geen back-up van het Stalboekje.\n\nWil je het hengstenbestand inlezen? Gebruik dan de knop daarboven.");return}
+    ask("Je huidige paarden vervangen door deze back-up ("+x.horses.length+" paarden)?","Ja, vervangen",function(){
+    D.groups=x.groups||D.groups;D.horses=x.horses;D.ped=x.ped||D.ped;if(x.rassen)D.rassen=x.rassen;save();render();toast("Back-up teruggezet ✓")});
+  });
+}
+
+render();
+dbxStart();
+</script>
+</body>
+</html>

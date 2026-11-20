@@ -17,6 +17,7 @@ Een eenvoudige fok-app voor Horse Nation, gemaakt om makkelijk te gebruiken.
 - Voor de beheerder: zet het adres van deze app (bijv. `https://serena563.github.io/naam-van-de-repo/`) bij **Redirect URIs** in de Dropbox App Console, bij dezelfde app als de Stalmanager.
 
 ## Goed om te weten
+- De app heeft een ingebouwde lijst met Friese dekhengsten en stambomen (stand 20 november 2026). Een nieuwer hengstenbestand inlezen bij Back-up vervangt die lijst.
 - Alles wordt bewaard in de browser op het apparaat waarop je de app gebruikt.
 - Inteelt wordt berekend over 4 generaties, net als in Horse Nation.
 - De app toont standaard alleen Friese dekhengsten. Andere rassen zet je aan bij Back-up → Rassen.
